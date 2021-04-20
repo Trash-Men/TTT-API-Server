@@ -1,0 +1,56 @@
+version: '3.8'
+services:
+  development_database:
+    image: postgres:13.2
+    container_name: development_database
+    environment:
+      POSTGRES_USER: woochanleee
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: development_db
+    ports:
+      - target: 5432
+        published: 9090
+        protocol: tcp
+        mode: host
+    volumes:
+      - ./database/ddl.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./backup/development_database:/var/lib/postgresql/data
+      # - type: bind
+      #   source: ./ddl.sql
+      #   target: /docker-entrypoint-initdb.d/init.sql
+      #   read_only: true
+      #   volume:
+      #     nocopy: true
+      # - type: volume
+      #   source: database_data
+      #   target: /var/lib/postgresql
+      # read_only: false
+      # volume:
+      #   nocopy: false
+# volumes:
+#   database_data:
+# docker-compose -f development-database.yaml up -d
+
+# -d 를 사용해 데이터베이스를 지정하지 않을 시 디폴트로 user name을 사용한다.
+# psql -h 0.0.0.0 -U woochanleee -d development_db -p 9090 -W
+# psql -h 127.0.0.1 -U woochanleee -d development_db -p 9090 -W
+# psql -h localhost -U woochanleee -d development_db -p 9090 -W
+
+# -h : host, -U: username, -d : Database, -W : password
+
+# \l -> db 리스트 확인
+# \c development_db -> db change
+# \du -> db권한 확인
+# \dt -> 테이블 리스트
+# \q -> exit
+
+# create user woochanleee password 'test' superuser;
+# create database development_db owner woochanleee;
+
+# https://hub.docker.com/_/postgres
+# Warning: scripts in /docker-entrypoint-initdb.d are only run
+# if you start the container with a data directory that is empty;
+# any pre-existing database will be left untouched on container startup.
+
+# 위 스크립트는 오직 컨테이너가 빈 데이터 폴더 안에서 실행될때 만 작동한다.
+# 컨테이너가 시작할때 기존 데이터베이스는 유지된다.

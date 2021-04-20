@@ -1,0 +1,36 @@
+name: docker
+on:
+  push:
+    branches:
+      - main
+jobs:
+  image_build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: CheckOut
+        uses: actions/checkout@v2
+        with:
+          repository: Trash-Men/TTT-API-Server
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build a Docker Image
+        run: |
+          docker build --build-arg MODE=production --build-arg JWT_SECRET_KEY=${JWT_SECRET_KEY} --build-arg S3_BUCKET_NAME=${S3_BUCKET_NAME} --build-arg DB_NAME=${DB_NAME} --build-arg SERVER_PORT=5000 --build-arg DB_HOST=${DB_HOST} --build-arg DB_PORT=${DB_PORT} --build-arg DB_USER=${DB_USER} --build-arg DB_PASSWORD=${DB_PASSWORD} --build-arg IAM_ACCESS_KEY=${IAM_ACCESS_KEY} --build-arg IAM_SECRET_ACCESS_KEY=${IAM_SECRET_ACCESS_KEY} -t woochanlee/ttt-server:1.0.0 .
+        env:
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          SERVER_PORT: ${{ secrets.SERVER_PORT }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          IAM_ACCESS_KEY: ${{ secrets.IAM_ACCESS_KEY }}
+          IAM_SECRET_ACCESS_KEY: ${{ secrets.IAM_SECRET_ACCESS_KEY }}
+      - name: Push a Docker Image
+        run: docker push woochanlee/ttt-server:1.0.0
